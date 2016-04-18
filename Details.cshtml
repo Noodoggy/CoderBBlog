@@ -1,0 +1,159 @@
+﻿@model CoderBBlog.Models.BlogPost
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    
+    <dl class="dl-horizontal">
+        <div class="row">
+            <!--<dt>
+                @Html.DisplayNameFor(model => model.Title)
+            </dt>-->
+
+            <dd>
+                <h2>@Html.DisplayFor(model => model.Title)</h2>
+</dd>
+            <!--<dt>
+                @Html.DisplayNameFor(model => model.Created)
+            </dt>-->
+
+            <dd>
+                @Html.DisplayFor(model => model.Created.LocalDateTime)
+            </dd>
+
+            <!--<dt>
+                @Html.DisplayNameFor(model => model.Updated)
+            </dt>-->
+
+            <dd>
+                @Html.DisplayFor(model => model.Updated)
+            </dd>
+        </div>
+        <dd>
+            @if (Model.MediaURL != null)
+            {
+                <img class="img-responsive" src="@Url.Content(Model.MediaURL)" alt="" />
+            }
+            <!--Old img source display
+        <img src="@Html.DisplayFor(model => model.MediaURL)" />
+        -->
+        </dd>
+       
+        
+      
+
+        
+
+        <!--<dt>
+            @Html.DisplayNameFor(model => model.Body)
+        </dt>-->
+
+        <dd>
+            <div id="blog-body">
+                @Html.Raw(Model.Body)
+                </div>
+        </dd>
+
+        <!--<dt>
+            @Html.DisplayNameFor(model => model.MediaURL)
+        </dt>-->
+
+
+
+        <!--<dt>
+           @*@Html.DisplayNameFor(model => model.Published)*@
+        </dt>-->
+
+        <dd>
+            @*@Html.DisplayFor(model => model.Published)*@
+        </dd>
+
+    </dl>
+</div>
+<p>@if (@User.IsInRole("Admin"))
+{
+    <p>@Html.ActionLink("Edit", "Edit", new { slug = Model.Slug })</p>
+    <p>@Html.ActionLink("Delete", "Delete", new { id = Model.Id })</p>
+    <p>@Html.ActionLink("Back to List", "Index")</p>
+}
+else {
+        @Html.ActionLink("Back to List", "BlogsList")
+}
+    @if(Request.IsAuthenticated)
+{
+        using (Html.BeginForm("Comment", "BlogPosts", FormMethod.Post))
+        {
+            @Html.AntiForgeryToken()
+    <input type="hidden" name="PostId" value="@Model.Id" />
+    <div class="row">
+        <div class="row">
+            <div class="form-group">
+                <label class="sr-only" for="Comment">Comments:</label>
+                <input type="text" id="comment" class="form-control" name="Body" placeholder="Leave a comment here..." required />
+            </div>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary btn-sm" id="submit-button">
+            <i class="fade loading-icon"></i> <span>Submit Comment</span>
+        </button>
+        }
+    }
+    else {
+        @Html.ActionLink("Log in to comment", "Login", "Account", routeValues: null, htmlAttributes: new { id = "loginLink" })
+
+
+
+        }
+
+<h3>
+    Commments
+</h3>
+
+<a name="comments"></a>
+    @foreach (var com in Model.Comments)
+    {
+        <div id="comment-whole">
+            <div class="row" id="comment-body" style="padding: 20px; font-size: large">
+                <p>@com.Body</p>
+                <br />
+            </div>
+            <div class="row" id="comment-author" style="padding: 10px">
+                <div class="col-sm-6">
+
+                </div>
+                <div class="col-sm-6">
+                    <h4>
+                        @Html.Raw(com.Author.Email)
+                        <small>
+
+                            @if (com.Updated == null)
+                            {
+
+                                @com.Created.LocalDateTime;
+                            }
+
+                            else
+                            {
+                                @com.Updated;
+                            }
+                            @if (User.Identity.Name == com.Author.Email)
+                            {  @Html.ActionLink("    Edit  ", "EditComment", new { Id = com.Id })  }
+                            @if (User.IsInRole("Admin") || User.IsInRole("Moderator") || (User.Identity.Name == com.Author.Email))
+                            {
+                               @Html.ActionLink("Delete", "DeleteComment", new { Id = com.Id });
+                            }
+
+                        </small>
+
+                    </h4>
+                </div>
+            </div>
+        </div>
+    }
+.
+
+
